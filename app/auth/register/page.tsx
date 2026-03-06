@@ -1,0 +1,144 @@
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { CheckCircle } from 'lucide-react';
+import { authApi } from '@/lib/api';
+import toast from 'react-hot-toast';
+
+export default function VendorRegisterPage() {
+  const router = useRouter();
+  const [done, setDone] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    phone: '',
+    businessName: '',
+    description: '',
+    address: '',
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (form.password !== form.confirmPassword) {
+      toast.error('كلمتا المرور غير متطابقتين');
+      return;
+    }
+    setLoading(true);
+    try {
+      await authApi.registerVendor({
+        fullName: form.fullName,
+        email: form.email,
+        password: form.password,
+        phone: form.phone,
+        businessName: form.businessName,
+        description: form.description,
+        address: form.address,
+      });
+      setDone(true);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'حدث خطأ أثناء التسجيل');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-gray-100 flex items-center justify-center px-4" dir="rtl">
+        <div className="card max-w-md w-full text-center shadow-lg py-10">
+          <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-500" />
+          <h2 className="text-xl font-bold text-gray-900 mb-2">تم تسجيل طلبك بنجاح!</h2>
+          <p className="text-gray-500 text-sm mb-6">
+            سيتم مراجعة طلبك من قِبل الإدارة. ستتلقى إشعاراً عبر البريد الإلكتروني عند الموافقة.
+          </p>
+          <Link href="/auth/login" className="btn-primary inline-block px-8">
+            تسجيل الدخول
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary-50 to-gray-100 flex items-center justify-center px-4 py-12" dir="rtl">
+      <div className="w-full max-w-lg">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-primary-600">مشتالم</h1>
+          <p className="text-gray-500 mt-1 text-sm">سجّل كمورد وابدأ البيع</p>
+        </div>
+
+        <div className="card shadow-lg">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">إنشاء حساب مورد</h2>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل *</label>
+                <input name="fullName" value={form.fullName} onChange={handleChange} required className="input-field" placeholder="محمد أحمد" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف *</label>
+                <input name="phone" value={form.phone} onChange={handleChange} required className="input-field" placeholder="050-0000000" />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني *</label>
+              <input name="email" type="email" value={form.email} onChange={handleChange} required className="input-field" placeholder="example@email.com" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور *</label>
+                <input name="password" type="password" value={form.password} onChange={handleChange} required className="input-field" placeholder="8 أحرف على الأقل" minLength={8} />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">تأكيد كلمة المرور *</label>
+                <input name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} required className="input-field" placeholder="••••••••" />
+              </div>
+            </div>
+
+            <hr className="border-gray-100" />
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">معلومات النشاط التجاري</p>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">اسم النشاط التجاري *</label>
+              <input name="businessName" value={form.businessName} onChange={handleChange} required className="input-field" placeholder="متجر الأناقة" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">العنوان</label>
+              <input name="address" value={form.address} onChange={handleChange} className="input-field" placeholder="الناصرة، شارع الاستقلال 5" />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">وصف النشاط</label>
+              <textarea name="description" value={form.description} onChange={handleChange} className="input-field" rows={3} placeholder="اكتب وصفاً موجزاً عن نشاطك التجاري..." />
+            </div>
+
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-blue-700">
+              ⓘ سيتم مراجعة طلبك من قِبل الإدارة قبل تفعيل الحساب. قد يستغرق ذلك 24-48 ساعة.
+            </div>
+
+            <button type="submit" disabled={loading} className="w-full btn-primary py-3 text-base">
+              {loading ? 'جاري التسجيل...' : 'إرسال طلب التسجيل'}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-4">
+            لديك حساب بالفعل؟{' '}
+            <Link href="/auth/login" className="text-primary-600 hover:underline font-medium">تسجيل الدخول</Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
