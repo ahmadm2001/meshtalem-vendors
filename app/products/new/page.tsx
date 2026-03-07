@@ -8,7 +8,8 @@ import toast from 'react-hot-toast';
 
 export default function NewProductPage() {
   const router = useRouter();
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);   // root categories (tree)
+  const [subCategories, setSubCategories] = useState<any[]>([]); // children of selected root
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [images, setImages] = useState<string[]>(['', '', '']);
@@ -17,12 +18,21 @@ export default function NewProductPage() {
     descriptionAr: '',
     price: '',
     stock: '',
-    categoryId: '',
+    categoryId: '',    // root category
+    subCategoryId: '', // sub category (optional)
   });
 
   useEffect(() => {
     categoriesApi.getAll().then((r) => setCategories(r.data || [])).catch(() => {});
   }, []);
+
+  // When root category changes, load its sub-categories
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const rootId = e.target.value;
+    const root = categories.find((c: any) => c.id === rootId);
+    setSubCategories(root?.children || []);
+    setForm({ ...form, categoryId: rootId, subCategoryId: '' });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -67,12 +77,14 @@ export default function NewProductPage() {
 
     setLoading(true);
     try {
+      // Use sub-category if selected, otherwise use root category
+      const finalCategoryId = form.subCategoryId || form.categoryId || undefined;
       await productsApi.create({
         nameAr: form.nameAr,
         descriptionAr: form.descriptionAr,
         price: Number(form.price),
         stock: Number(form.stock) || 0,
-        categoryId: form.categoryId || undefined,
+        categoryId: finalCategoryId,
         images: validImages,
       });
       setDone(true);
@@ -96,7 +108,7 @@ export default function NewProductPage() {
             بعد مراجعة الإدارة وموافقتها، سيظهر المنتج في المتجر.
           </p>
           <div className="flex gap-3 justify-center">
-            <button onClick={() => { setDone(false); setForm({ nameAr:'', descriptionAr:'', price:'', stock:'', categoryId:'' }); setImages(['','','']); }} className="btn-primary">
+            <button onClick={() => { setDone(false); setForm({ nameAr:'', descriptionAr:'', price:'', stock:'', categoryId:'', subCategoryId:'' }); setImages(['','','']); setSubCategories([]); }} className="btn-primary">
               إضافة منتج آخر
             </button>
             <button onClick={() => router.push('/products')} className="btn-secondary">
@@ -147,14 +159,33 @@ export default function NewProductPage() {
                   <input name="stock" type="number" min="0" value={form.stock} onChange={handleChange} required className="input-field" placeholder="100" />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">الفئة</label>
-                <select name="categoryId" value={form.categoryId} onChange={handleChange} className="input-field">
-                  <option value="">-- اختر فئة --</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.nameAr || cat.nameHe}</option>
-                  ))}
-                </select>
+              <div className="space-y-3">
+                {/* Root category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">الفئة الرئيسية</label>
+                  <select value={form.categoryId} onChange={handleCategoryChange} className="input-field">
+                    <option value="">-- اختر فئة رئيسية --</option>
+                    {categories.map((cat: any) => (
+                      <option key={cat.id} value={cat.id}>{cat.nameAr || cat.nameHe}</option>
+                    ))}
+                  </select>
+                </div>
+                {/* Sub-category - shown only if root has children */}
+                {subCategories.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      الفئة الفرعية <span className="text-gray-400 font-normal">(اختياري)</span>
+                    </label>
+                    <select name="subCategoryId" value={form.subCategoryId}
+                      onChange={e => setForm({ ...form, subCategoryId: e.target.value })}
+                      className="input-field">
+                      <option value="">-- كل {categories.find((c:any)=>c.id===form.categoryId)?.nameAr || 'الفئة'} --</option>
+                      {subCategories.map((sub: any) => (
+                        <option key={sub.id} value={sub.id}>{sub.nameAr || sub.nameHe}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             </div>
           </div>

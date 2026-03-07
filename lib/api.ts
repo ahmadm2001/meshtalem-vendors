@@ -44,6 +44,7 @@ export const ordersApi = {
 
 export const categoriesApi = {
   getAll: () => api.get('/categories'),
+  getFlat: () => api.get('/categories/flat'),
 };
 
 export const vendorApi = {
