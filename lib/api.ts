@@ -42,6 +42,10 @@ export const ordersApi = {
   getStats: () => api.get('/orders/vendor/stats'),
 };
 
+export const categoriesApi = {
+  getAll: () => api.get('/categories'),
+};
+
 export const vendorApi = {
   getProfile: () => api.get('/vendors/my-profile'),
   updateProfile: (data: any) => api.put('/vendors/my-profile', data),

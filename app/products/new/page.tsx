@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Upload, X, CheckCircle } from 'lucide-react';
+import { Sparkles, X, CheckCircle, Plus, Image as ImageIcon } from 'lucide-react';
 import { productsApi, categoriesApi } from '@/lib/api';
 import VendorLayout from '@/components/layout/VendorLayout';
 import toast from 'react-hot-toast';
@@ -11,6 +11,7 @@ export default function NewProductPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [images, setImages] = useState<string[]>(['', '', '']);
   const [form, setForm] = useState({
     nameAr: '',
     descriptionAr: '',
@@ -27,10 +28,43 @@ export default function NewProductPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleImageChange = (index: number, value: string) => {
+    const updated = [...images];
+    updated[index] = value;
+    setImages(updated);
+  };
+
+  const addImageField = () => {
+    if (images.length < 8) setImages([...images, '']);
+  };
+
+  const removeImageField = (index: number) => {
+    if (images.length <= 3) { toast.error('يجب إضافة 3 صور على الأقل'); return; }
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const validImages = images.filter((url) => url.trim() !== '');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.nameAr.trim()) { toast.error('يرجى إدخال اسم المنتج'); return; }
     if (!form.price || Number(form.price) <= 0) { toast.error('يرجى إدخال سعر صحيح'); return; }
+
+    // Validate images - at least 3 valid URLs
+    if (validImages.length < 3) {
+      toast.error('يجب إضافة 3 صور على الأقل للمنتج');
+      return;
+    }
+
+    // Basic URL validation
+    const invalidUrls = validImages.filter((url) => {
+      try { new URL(url); return false; } catch { return true; }
+    });
+    if (invalidUrls.length > 0) {
+      toast.error('يرجى التأكد من صحة روابط الصور');
+      return;
+    }
+
     setLoading(true);
     try {
       await productsApi.create({
@@ -39,6 +73,7 @@ export default function NewProductPage() {
         price: Number(form.price),
         stock: Number(form.stock) || 0,
         categoryId: form.categoryId || undefined,
+        images: validImages,
       });
       setDone(true);
     } catch (err: any) {
@@ -61,7 +96,7 @@ export default function NewProductPage() {
             بعد مراجعة الإدارة وموافقتها، سيظهر المنتج في المتجر.
           </p>
           <div className="flex gap-3 justify-center">
-            <button onClick={() => { setDone(false); setForm({ nameAr:'', descriptionAr:'', price:'', stock:'', categoryId:'' }); }} className="btn-primary">
+            <button onClick={() => { setDone(false); setForm({ nameAr:'', descriptionAr:'', price:'', stock:'', categoryId:'' }); setImages(['','','']); }} className="btn-primary">
               إضافة منتج آخر
             </button>
             <button onClick={() => router.push('/products')} className="btn-secondary">
@@ -90,68 +125,28 @@ export default function NewProductPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Product Info */}
           <div className="card">
             <h2 className="font-semibold text-gray-800 mb-4 text-sm">معلومات المنتج</h2>
-
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  اسم المنتج (بالعربية) *
-                </label>
-                <input
-                  name="nameAr"
-                  value={form.nameAr}
-                  onChange={handleChange}
-                  required
-                  className="input-field"
-                  placeholder="مثال: حذاء رياضي أديداس"
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1">اسم المنتج (بالعربية) *</label>
+                <input name="nameAr" value={form.nameAr} onChange={handleChange} required className="input-field" placeholder="مثال: حذاء رياضي أديداس" />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  وصف المنتج (بالعربية)
-                </label>
-                <textarea
-                  name="descriptionAr"
-                  value={form.descriptionAr}
-                  onChange={handleChange}
-                  className="input-field"
-                  rows={4}
-                  placeholder="اكتب وصفاً تفصيلياً للمنتج، مميزاته، المواد المستخدمة..."
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-1">وصف المنتج (بالعربية)</label>
+                <textarea name="descriptionAr" value={form.descriptionAr} onChange={handleChange} className="input-field" rows={4} placeholder="اكتب وصفاً تفصيلياً للمنتج، مميزاته، المواد المستخدمة..." />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">السعر (₪) *</label>
-                  <input
-                    name="price"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={form.price}
-                    onChange={handleChange}
-                    required
-                    className="input-field"
-                    placeholder="99.90"
-                  />
+                  <input name="price" type="number" min="0" step="0.01" value={form.price} onChange={handleChange} required className="input-field" placeholder="99.90" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">الكمية المتاحة *</label>
-                  <input
-                    name="stock"
-                    type="number"
-                    min="0"
-                    value={form.stock}
-                    onChange={handleChange}
-                    required
-                    className="input-field"
-                    placeholder="100"
-                  />
+                  <input name="stock" type="number" min="0" value={form.stock} onChange={handleChange} required className="input-field" placeholder="100" />
                 </div>
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">الفئة</label>
                 <select name="categoryId" value={form.categoryId} onChange={handleChange} className="input-field">
@@ -164,12 +159,67 @@ export default function NewProductPage() {
             </div>
           </div>
 
-          <div className="card bg-gray-50 border-dashed border-2 border-gray-200">
-            <div className="text-center py-4">
-              <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-              <p className="text-sm font-medium text-gray-600">رفع صور المنتج</p>
-              <p className="text-xs text-gray-400 mt-1">يمكنك إضافة الصور بعد حفظ المنتج</p>
+          {/* Images Section */}
+          <div className="card">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="font-semibold text-gray-800 text-sm">صور المنتج *</h2>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  يجب إضافة <span className="font-bold text-red-500">3 صور على الأقل</span> - أدخل روابط URL للصور
+                </p>
+              </div>
+              <span className={`text-xs font-medium px-2 py-1 rounded-full ${validImages.length >= 3 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                {validImages.length}/3 صور مطلوبة
+              </span>
             </div>
+
+            <div className="space-y-3">
+              {images.map((url, index) => (
+                <div key={index} className="space-y-2">
+                  <div className="flex gap-2 items-center">
+                    <div className="flex-1 relative">
+                      <input
+                        type="url"
+                        value={url}
+                        onChange={(e) => handleImageChange(index, e.target.value)}
+                        className={`input-field pl-9 text-sm ${index < 3 ? 'border-red-200 focus:border-red-400' : ''}`}
+                        placeholder={`رابط الصورة ${index + 1}${index < 3 ? ' (مطلوب)' : ' (اختياري)'}`}
+                        dir="ltr"
+                      />
+                      <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    </div>
+                    {index >= 3 && (
+                      <button type="button" onClick={() => removeImageField(index)} className="p-2 text-red-400 hover:bg-red-50 rounded-lg">
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  {/* Image Preview */}
+                  {url && (
+                    <div className="mr-0">
+                      <img
+                        src={url}
+                        alt={`صورة ${index + 1}`}
+                        className="h-20 w-20 object-cover rounded-lg border border-gray-200"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        onLoad={(e) => { (e.target as HTMLImageElement).style.display = 'block'; }}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {images.length < 8 && (
+              <button type="button" onClick={addImageField} className="mt-3 flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium">
+                <Plus className="w-4 h-4" />
+                إضافة صورة أخرى
+              </button>
+            )}
+
+            <p className="text-xs text-gray-400 mt-3">
+              💡 يمكنك رفع صورك على <a href="https://imgbb.com" target="_blank" rel="noreferrer" className="text-primary-600 underline">imgbb.com</a> أو <a href="https://imgur.com" target="_blank" rel="noreferrer" className="text-primary-600 underline">imgur.com</a> ونسخ الرابط هنا
+            </p>
           </div>
 
           <div className="flex gap-3">
