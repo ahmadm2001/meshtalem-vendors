@@ -40,6 +40,8 @@ export const productsApi = {
 export const ordersApi = {
   getMyOrders: (params?: any) => api.get('/orders/vendor', { params }),
   getStats: () => api.get('/orders/vendor/stats'),
+  updateItemStatus: (itemId: string, status: string) =>
+    api.put(`/orders/items/${itemId}/status`, { status }),
 };
 
 export const categoriesApi = {
