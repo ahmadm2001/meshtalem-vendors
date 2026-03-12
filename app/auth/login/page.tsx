@@ -20,14 +20,14 @@ export default function VendorLoginPage() {
       const { user, accessToken } = res.data;
       const access_token = accessToken;
       if (user.role !== 'vendor') {
-        toast.error('هذه البوابة مخصصة للموردين فقط');
+        toast.error('פורטל זה מיועד לספקים בלבד');
         return;
       }
       setAuth({ ...user, vendorStatus: user.vendor?.status }, access_token);
-      toast.success(`أهلاً بك، ${user.fullName}!`);
+      toast.success(`ברוך הבא, ${user.fullName}!`);
       router.push('/dashboard');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'خطأ في تسجيل الدخول');
+      toast.error(err.response?.data?.message || 'שגיאה בהתחברות');
     } finally {
       setLoading(false);
     }
@@ -37,16 +37,16 @@ export default function VendorLoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-gray-100 flex items-center justify-center px-4 py-12" dir="rtl">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary-600">مشتالم</h1>
-          <p className="text-gray-500 mt-1 text-sm">بوابة الموردين</p>
+          <h1 className="text-3xl font-bold text-primary-600">משתלם</h1>
+          <p className="text-gray-500 mt-1 text-sm">פורטל ספקים</p>
         </div>
 
         <div className="card shadow-lg">
-          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">تسجيل الدخول</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">התחברות</h2>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">דואר אלקטרוני</label>
               <input
                 type="email"
                 value={form.email}
@@ -55,7 +55,7 @@ export default function VendorLoginPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">סיסמה</label>
               <input
                 type="password"
                 value={form.password}
@@ -64,14 +64,14 @@ export default function VendorLoginPage() {
               />
             </div>
             <button type="submit" disabled={loading} className="w-full btn-primary py-3 text-base">
-              {loading ? 'جاري الدخول...' : 'تسجيل الدخول'}
+              {loading ? 'מתחבר...' : 'התחבר'}
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-4">
-            ليس لديك حساب؟{' '}
+            אין לך חשבון?{' '}
             <Link href="/auth/register" className="text-primary-600 hover:underline font-medium">
-              سجّل كمورد
+              הירשם כספק
             </Link>
           </p>
         </div>

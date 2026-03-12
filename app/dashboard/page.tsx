@@ -17,24 +17,24 @@ export default function VendorDashboard() {
   }, []);
 
   const cards = [
-    { label: 'إجمالي المبيعات', value: stats ? `₪${Number(stats.totalRevenue || 0).toFixed(0)}` : '...', icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-50' },
-    { label: 'الطلبات الكلية', value: stats?.totalOrders ?? '...', icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'منتجات نشطة', value: stats?.activeProducts ?? '...', icon: Package, color: 'text-purple-600', bg: 'bg-purple-50' },
-    { label: 'طلبات معلقة', value: stats?.pendingOrders ?? '...', icon: Clock, color: 'text-orange-600', bg: 'bg-orange-50' },
+    { label: 'סה"כ מכירות', value: stats ? `₪${Number(stats.totalRevenue || 0).toFixed(0)}` : '...', icon: TrendingUp, color: 'text-green-600', bg: 'bg-green-50' },
+    { label: 'סה"כ הזמנות', value: stats?.totalOrders ?? '...', icon: ShoppingBag, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { label: 'מוצרים פעילים', value: stats?.activeProducts ?? '...', icon: Package, color: 'text-purple-600', bg: 'bg-purple-50' },
+    { label: 'הזמנות ממתינות', value: stats?.pendingOrders ?? '...', icon: Clock, color: 'text-orange-600', bg: 'bg-orange-50' },
   ];
 
   const statusMap: Record<string, { label: string; cls: string }> = {
-    pending:    { label: 'معلق',    cls: 'badge-pending' },
-    confirmed:  { label: 'مؤكد',   cls: 'badge-approved' },
-    processing: { label: 'قيد التنفيذ', cls: 'bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full' },
-    shipped:    { label: 'تم الشحن', cls: 'bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full' },
-    delivered:  { label: 'تم التسليم', cls: 'badge-approved' },
-    cancelled:  { label: 'ملغي',   cls: 'badge-rejected' },
+    pending:    { label: 'ממתין',       cls: 'badge-pending' },
+    confirmed:  { label: 'מאושר',       cls: 'badge-approved' },
+    processing: { label: 'בטיפול',      cls: 'bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full' },
+    shipped:    { label: 'נשלח',        cls: 'bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded-full' },
+    delivered:  { label: 'נמסר',        cls: 'badge-approved' },
+    cancelled:  { label: 'בוטל',        cls: 'badge-rejected' },
   };
 
   return (
     <VendorLayout>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">لوحة التحكم</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">לוח בקרה</h1>
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -57,11 +57,11 @@ export default function VendorDashboard() {
         {/* Recent Orders */}
         <div className="card">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-gray-900 text-sm">آخر الطلبات</h2>
-            <Link href="/orders" className="text-xs text-primary-600 hover:underline">عرض الكل</Link>
+            <h2 className="font-bold text-gray-900 text-sm">הזמנות אחרונות</h2>
+            <Link href="/orders" className="text-xs text-primary-600 hover:underline">הצג הכל</Link>
           </div>
           {recentOrders.length === 0 ? (
-            <div className="text-center py-6 text-gray-400 text-sm">لا توجد طلبات بعد</div>
+            <div className="text-center py-6 text-gray-400 text-sm">אין הזמנות עדיין</div>
           ) : (
             <div className="space-y-2">
               {recentOrders.map((order) => {
@@ -85,16 +85,16 @@ export default function VendorDashboard() {
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-yellow-500" />
-              منتجات قيد المراجعة
+              מוצרים בבדיקה
             </h2>
-            <Link href="/products" className="text-xs text-primary-600 hover:underline">عرض الكل</Link>
+            <Link href="/products" className="text-xs text-primary-600 hover:underline">הצג הכל</Link>
           </div>
           {pendingProducts.length === 0 ? (
             <div className="text-center py-6">
-              <p className="text-gray-400 text-sm mb-3">لا توجد منتجات معلقة</p>
+              <p className="text-gray-400 text-sm mb-3">אין מוצרים ממתינים</p>
               <Link href="/products/new" className="btn-primary text-sm flex items-center gap-2 justify-center w-fit mx-auto px-4">
                 <PlusCircle className="w-4 h-4" />
-                أضف منتجاً جديداً
+                הוסף מוצר חדש
               </Link>
             </div>
           ) : (
@@ -102,10 +102,10 @@ export default function VendorDashboard() {
               {pendingProducts.map((p) => (
                 <div key={p.id} className="flex items-center justify-between p-2 bg-yellow-50 rounded-lg border border-yellow-100">
                   <div>
-                    <p className="font-medium text-gray-800 text-sm">{p.nameAr}</p>
-                    <p className="text-xs text-gray-400">₪{Number(p.price).toFixed(2)}</p>
+                    <p className="font-medium text-gray-800 text-sm">{p.nameHe || p.nameAr}</p>
+                    <p className="text-xs text-gray-400">₪{Number(p.price || p.vendorPrice).toFixed(2)}</p>
                   </div>
-                  <span className="badge-pending">قيد المراجعة</span>
+                  <span className="badge-pending">בבדיקה</span>
                 </div>
               ))}
             </div>

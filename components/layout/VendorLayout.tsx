@@ -6,11 +6,11 @@ import { LayoutDashboard, Package, PlusCircle, ShoppingBag, User, LogOut, Store 
 import { useAuthStore } from '@/store';
 
 const navItems = [
-  { href: '/dashboard',   icon: LayoutDashboard, label: 'لوحة التحكم' },
-  { href: '/products',    icon: Package,         label: 'منتجاتي' },
-  { href: '/products/new',icon: PlusCircle,      label: 'إضافة منتج' },
-  { href: '/orders',      icon: ShoppingBag,     label: 'الطلبات' },
-  { href: '/profile',     icon: User,            label: 'الملف الشخصي' },
+  { href: '/dashboard',    icon: LayoutDashboard, label: 'לוח בקרה' },
+  { href: '/products',     icon: Package,         label: 'המוצרים שלי' },
+  { href: '/products/new', icon: PlusCircle,      label: 'הוסף מוצר' },
+  { href: '/orders',       icon: ShoppingBag,     label: 'הזמנות' },
+  { href: '/profile',      icon: User,            label: 'פרופיל' },
 ];
 
 export default function VendorLayout({ children }: { children: React.ReactNode }) {
@@ -34,8 +34,8 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
           <div className="flex items-center gap-2">
             <Store className="w-5 h-5 text-primary-400" />
             <div>
-              <p className="font-bold text-white">مشتالم</p>
-              <p className="text-xs text-gray-400">بوابة الموردين</p>
+              <p className="font-bold text-white">משתלם</p>
+              <p className="text-xs text-gray-400">פורטל ספקים</p>
             </div>
           </div>
         </div>
@@ -45,7 +45,7 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
           <p className="text-sm font-medium text-white truncate">{user?.fullName}</p>
           <p className="text-xs text-gray-400 truncate">{user?.email}</p>
           {isPending && (
-            <span className="mt-1 inline-block badge-pending text-xs">في انتظار الموافقة</span>
+            <span className="mt-1 inline-block badge-pending text-xs">ממתין לאישור</span>
           )}
         </div>
 
@@ -68,7 +68,7 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
           <button onClick={logout}
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:bg-gray-800 w-full transition-colors">
             <LogOut className="w-4 h-4" />
-            تسجيل الخروج
+            התנתק
           </button>
         </div>
       </aside>
@@ -79,8 +79,8 @@ export default function VendorLayout({ children }: { children: React.ReactNode }
           <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6 flex items-start gap-3">
             <div className="text-yellow-600 mt-0.5">⏳</div>
             <div>
-              <p className="font-semibold text-yellow-800 text-sm">حسابك قيد المراجعة</p>
-              <p className="text-yellow-700 text-xs mt-0.5">سيتم مراجعة حسابك من قِبل الإدارة. ستتمكن من إضافة المنتجات بعد الموافقة.</p>
+              <p className="font-semibold text-yellow-800 text-sm">החשבון שלך בבדיקה</p>
+              <p className="text-yellow-700 text-xs mt-0.5">החשבון שלך נמצא בבדיקת ההנהלה. תוכל להוסיף מוצרים לאחר האישור.</p>
             </div>
           </div>
         )}

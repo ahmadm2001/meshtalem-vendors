@@ -21,7 +21,7 @@ export default function VendorProfilePage() {
       .then((r) => {
         const v = r.data;
         setForm({
-          businessName: v.businessName || '',
+          businessName: v.businessName || v.businessNameHe || '',
           description: v.description || '',
           phone: v.phone || v.user?.phone || '',
           address: v.address || '',
@@ -41,9 +41,9 @@ export default function VendorProfilePage() {
     setSaving(true);
     try {
       await vendorApi.updateProfile(form);
-      toast.success('تم تحديث الملف الشخصي');
+      toast.success('הפרופיל עודכן בהצלחה');
     } catch {
-      toast.error('حدث خطأ أثناء الحفظ');
+      toast.error('שגיאה בשמירה');
     } finally {
       setSaving(false);
     }
@@ -54,7 +54,7 @@ export default function VendorProfilePage() {
   return (
     <VendorLayout>
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">الملف الشخصي</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">פרופיל</h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="card">
@@ -64,43 +64,43 @@ export default function VendorProfilePage() {
               </div>
               <div>
                 <p className="font-semibold text-gray-900">{form.fullName}</p>
-                <p className="text-xs text-gray-400">بيانات الحساب</p>
+                <p className="text-xs text-gray-400">פרטי החשבון</p>
               </div>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">الاسم الكامل</label>
-                <input name="fullName" value={form.fullName} onChange={handleChange} className="input-field" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">שם מלא</label>
+                <input name="fullName" value={form.fullName} onChange={handleChange} className="input-field" dir="rtl" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">رقم الهاتف</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">מספר טלפון</label>
                 <input name="phone" value={form.phone} onChange={handleChange} className="input-field" placeholder="050-0000000" />
               </div>
             </div>
           </div>
 
           <div className="card">
-            <h2 className="font-semibold text-gray-800 mb-4 text-sm">معلومات النشاط التجاري</h2>
+            <h2 className="font-semibold text-gray-800 mb-4 text-sm">פרטי העסק</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">اسم النشاط التجاري</label>
-                <input name="businessName" value={form.businessName} onChange={handleChange} className="input-field" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">שם העסק</label>
+                <input name="businessName" value={form.businessName} onChange={handleChange} className="input-field" dir="rtl" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">العنوان / المدينة</label>
-                <input name="address" value={form.address} onChange={handleChange} className="input-field" placeholder="مثال: حيفا، شارع هرצل 5" />
+                <label className="block text-sm font-medium text-gray-700 mb-1">כתובת / עיר</label>
+                <input name="address" value={form.address} onChange={handleChange} className="input-field" placeholder="לדוגמה: חיפה, רחוב הרצל 5" dir="rtl" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">وصف النشاط</label>
-                <textarea name="description" value={form.description} onChange={handleChange} className="input-field" rows={3} />
+                <label className="block text-sm font-medium text-gray-700 mb-1">תיאור העסק</label>
+                <textarea name="description" value={form.description} onChange={handleChange} className="input-field" rows={3} dir="rtl" />
               </div>
             </div>
           </div>
 
           <button type="submit" disabled={saving} className="w-full btn-primary py-3 flex items-center justify-center gap-2">
             <Save className="w-4 h-4" />
-            {saving ? 'جاري الحفظ...' : 'حفظ التغييرات'}
+            {saving ? 'שומר...' : 'שמור שינויים'}
           </button>
         </form>
       </div>
